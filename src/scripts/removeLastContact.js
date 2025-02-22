@@ -1,20 +1,15 @@
-import { countContacts } from './countContacts.js';
-import { getAllContacts } from './getAllContacts.js';
-import { PATH_DB } from '../constants/contacts.js';
-import fs from 'node:fs/promises';
+import { readContacts } from '../utils/readContacts.js';
+import { writeContacts } from '../utils/writeContacts.js';
 
 export const removeLastContact = async () => {
-  const contactsLength = await countContacts();
-  if (!contactsLength) {
-    return;
-  }
+  const contacts = await readContacts();
+  if (contacts.length) {
+    const updatedContacts = contacts.slice(0, -1);
 
-  const contacts = await getAllContacts();
-  return await fs.writeFile(
-    PATH_DB,
-    JSON.stringify(contacts.slice(0, contactsLength - 1), null, 2),
-    'utf-8',
-  );
+    await writeContacts(updatedContacts);
+  } else {
+    await writeContacts();
+  }
 };
 
 removeLastContact();
